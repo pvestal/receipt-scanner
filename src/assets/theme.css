@@ -1,0 +1,294 @@
+/**
+ * Global theme styles for Receipt Scanner
+ * This enhances the Tailwind theme with additional styling needs
+ * Includes light and dark theme support
+ */
+
+:root {
+  /* Theme transition duration - applies to all theme color changes */
+  --theme-transition-duration: 400ms;
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Animation timings */
+  --animation-bounce: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animation-slide: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animation-fade: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light theme (default) */
+:root, .light-theme {
+  /* Primary color palette - enhanced for better contrast */
+  --color-primary: #2563EB;       /* blue-600 - better contrast on white */
+  --color-primary-light: #93C5FD; /* blue-300 */
+  --color-primary-dark: #1E40AF;  /* blue-800 */
+  --color-primary-contrast: #FFFFFF; /* white text on primary */
+
+  /* Secondary color palette - enhanced for better contrast */
+  --color-secondary: #059669;     /* emerald-600 - better contrast on white */
+  --color-secondary-light: #6EE7B7; /* emerald-300 */
+  --color-secondary-dark: #065F46; /* emerald-800 */
+  --color-secondary-contrast: #FFFFFF; /* white text on secondary */
+
+  /* Accent color - good for highlights and tertiary actions */
+  --color-accent: #8B5CF6;        /* violet-500 */
+  --color-accent-light: #C4B5FD;  /* violet-300 */
+  --color-accent-dark: #5B21B6;   /* violet-800 */
+  --color-accent-contrast: #FFFFFF; /* white text on accent */
+
+  /* Neutrals - standard gray scale */
+  --color-gray-50: #F9FAFB;
+  --color-gray-100: #F3F4F6;
+  --color-gray-200: #E5E7EB;
+  --color-gray-300: #D1D5DB;
+  --color-gray-400: #9CA3AF;
+  --color-gray-500: #6B7280;
+  --color-gray-600: #4B5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1F2937;
+  --color-gray-900: #111827;
+
+  /* Feedback colors - enhanced for WCAG AA compliance */
+  --color-success: #059669;     /* emerald-600 - better contrast */
+  --color-warning: #D97706;     /* amber-600 - better contrast */
+  --color-error: #DC2626;       /* red-600 - better contrast */
+  --color-info: #2563EB;        /* blue-600 - better contrast */
+
+  /* Semantic colors */
+  --color-background: #FFFFFF;
+  --color-surface: #FFFFFF;
+  --color-surface-secondary: #F9FAFB; /* gray-50 for secondary surfaces */
+  --color-text: #111827;        /* gray-900 - high contrast */
+  --color-text-secondary: #4B5563; /* gray-600 - better contrast than 500 */
+  --color-border: #D1D5DB;      /* gray-300 - slightly darker for better visibility */
+  --color-shadow: rgba(0, 0, 0, 0.1);
+
+  /* High contrast options for accessibility */
+  --color-high-contrast-text: #000000;
+  --color-high-contrast-border: #000000;
+}
+
+/* Dark theme - improved for better contrast and accessibility */
+.dark-theme {
+  /* Primary color palette - brightened for dark mode with better contrast */
+  --color-primary: #60A5FA;       /* blue-400 - good contrast on dark bg */
+  --color-primary-light: #93C5FD; /* blue-300 */
+  --color-primary-dark: #2563EB;  /* blue-600 */
+  --color-primary-contrast: #000000; /* black text on light primary */
+
+  /* Secondary color palette - brightened for dark mode */
+  --color-secondary: #34D399;     /* emerald-400 - good contrast on dark bg */
+  --color-secondary-light: #6EE7B7; /* emerald-300 */
+  --color-secondary-dark: #059669; /* emerald-600 */
+  --color-secondary-contrast: #000000; /* black text on light secondary */
+
+  /* Accent color - adjusted for dark mode */
+  --color-accent: #A78BFA;        /* violet-400 */
+  --color-accent-light: #C4B5FD;  /* violet-300 */
+  --color-accent-dark: #7C3AED;   /* violet-600 */
+  --color-accent-contrast: #000000; /* black text on light accent */
+
+  /* Neutrals - carefully tuned for dark mode readability */
+  --color-gray-900: #F9FAFB;  /* gray-50 */
+  --color-gray-800: #F3F4F6;  /* gray-100 */
+  --color-gray-700: #E5E7EB;  /* gray-200 */
+  --color-gray-600: #D1D5DB;  /* gray-300 */
+  --color-gray-500: #9CA3AF;  /* gray-400 */
+  --color-gray-400: #6B7280;  /* gray-500 */
+  --color-gray-300: #4B5563;  /* gray-600 */
+  --color-gray-200: #374151;  /* gray-700 */
+  --color-gray-100: #1F2937;  /* gray-800 */
+  --color-gray-50: #111827;   /* gray-900 */
+
+  /* Feedback colors - enhanced for dark mode visibility */
+  --color-success: #34D399;    /* emerald-400 - good contrast on dark */
+  --color-warning: #FBBF24;    /* amber-400 - good contrast on dark */
+  --color-error: #F87171;      /* red-400 - good contrast on dark */
+  --color-info: #60A5FA;       /* blue-400 - good contrast on dark */
+
+  /* Semantic colors - improved for better dark mode contrast */
+  --color-background: #0F172A; /* slate-900 - slightly blue-shifted for better feel */
+  --color-surface: #1E293B;    /* slate-800 - slightly blue-shifted */
+  --color-surface-secondary: #334155; /* slate-700 for secondary surfaces */
+  --color-text: #F8FAFC;       /* slate-50 - slightly warmer than pure white */
+  --color-text-secondary: #E2E8F0; /* slate-200 - higher contrast than before */
+  --color-border: #475569;     /* slate-600 - better contrast in dark mode */
+  --color-shadow: rgba(0, 0, 0, 0.5); /* darker shadow for visibility */
+
+  /* High contrast options for accessibility */
+  --color-high-contrast-text: #FFFFFF;
+  --color-high-contrast-border: #FFFFFF;
+}
+
+/* Apply theme transition to html element for smooth theme changes */
+html {
+  transition: background-color var(--theme-transition-duration),
+              color var(--theme-transition-duration);
+}
+
+/* Make all color properties transition smoothly when theme changes */
+*, *::before, *::after {
+  transition: background-color var(--theme-transition-duration),
+              border-color var(--theme-transition-duration),
+              color var(--theme-transition-duration),
+              fill var(--theme-transition-duration),
+              stroke var(--theme-transition-duration),
+              box-shadow var(--theme-transition-duration),
+              transform var(--theme-transition-duration);
+}
+
+/* Theme change animation keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideInFromTop {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInFromBottom {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Animation utility classes */
+.animate-fade-in {
+  animation: fadeIn var(--animation-fade) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--animation-bounce) forwards;
+}
+
+.animate-slide-in-top {
+  animation: slideInFromTop var(--animation-slide) forwards;
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom var(--animation-slide) forwards;
+}
+
+/* Add slight delay to theme transitions for sequential animations */
+.theme-transition-delay-1 {
+  transition-delay: 50ms;
+}
+
+.theme-transition-delay-2 {
+  transition-delay: 100ms;
+}
+
+.theme-transition-delay-3 {
+  transition-delay: 150ms;
+}
+
+/* Global styles for transitions (non-theme related) */
+.transition-all {
+  transition: all var(--transition-normal);
+}
+
+.transition-colors {
+  transition: background-color var(--transition-normal),
+              border-color var(--transition-normal),
+              color var(--transition-normal),
+              fill var(--transition-normal),
+              stroke var(--transition-normal);
+}
+
+.transition-opacity {
+  transition: opacity var(--transition-normal);
+}
+
+.transition-transform {
+  transition: transform var(--transition-normal);
+}
+
+/* Custom element styles */
+.btn {
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-secondary-dark);
+}
+
+.input {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-gray-300);
+  transition: all var(--transition-fast);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+/* Card and panel styles */
+.card {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 3px var(--color-shadow);
+  transition: box-shadow var(--transition-normal);
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px var(--color-shadow);
+}
+
+/* Animation utilities */
+.rotate-hover:hover {
+  transform: rotate(15deg);
+  transition: transform var(--transition-fast);
+}
+
+.scale-hover:hover {
+  transform: scale(1.05);
+  transition: transform var(--transition-fast);
+}
+
+/* Gradients */
+.gradient-primary {
+  background: linear-gradient(to right, var(--color-primary), var(--color-primary-dark));
+}
+
+.gradient-secondary {
+  background: linear-gradient(to right, var(--color-secondary), var(--color-secondary-dark));
+}

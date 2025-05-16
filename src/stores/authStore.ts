@@ -9,6 +9,8 @@ import {
   updateProfile,
   updateEmail,
   updatePassword,
+  GoogleAuthProvider,
+  signInWithPopup,
   type User,
   type UserCredential
 } from 'firebase/auth'
@@ -34,7 +36,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // Login method
+  // Login with email/password method
   async function login(email: string, password: string): Promise<boolean> {
     loading.value = true
     error.value = null
@@ -46,6 +48,25 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to login'
       console.error('Login error:', err)
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+  
+  // Login with Google method
+  async function loginWithGoogle(): Promise<boolean> {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const provider = new GoogleAuthProvider()
+      const userCredential = await signInWithPopup(auth, provider)
+      user.value = userCredential.user
+      return true
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to login with Google'
+      console.error('Google login error:', err)
       return false
     } finally {
       loading.value = false
@@ -192,6 +213,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading,
     error,
     login,
+    loginWithGoogle,
     register,
     logout,
     resetPassword,

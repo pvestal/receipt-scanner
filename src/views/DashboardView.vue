@@ -1,91 +1,89 @@
 <template>
-    <div>
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">My Receipts</h1>
+    <div class="dashboard-container">
+      <div class="header-section">
+        <h1 class="page-title">My Receipts</h1>
         
         <router-link 
           to="/scan" 
-          class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors"
+          class="scan-button"
         >
-          <span class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-            </svg>
-            Scan New Receipt
-          </span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="button-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+          </svg>
+          <span class="button-text">Scan New Receipt</span>
         </router-link>
       </div>
       
       <!-- Search and filter -->
-      <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <div class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0">
-          <div class="flex-1">
-            <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+      <div class="filter-section">
+        <div class="filter-grid">
+          <div class="search-container">
+            <label for="search" class="filter-label">Search</label>
             <input
               id="search"
               v-model="searchQuery"
               type="text"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+              class="filter-input"
               placeholder="Search by store or item..."
             />
           </div>
           
-          <div class="md:w-1/4">
-            <label for="dateFrom" class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
+          <div class="date-container">
+            <label for="dateFrom" class="filter-label">From Date</label>
             <input
               id="dateFrom"
               v-model="dateFrom"
               type="date"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+              class="filter-input"
             />
           </div>
           
-          <div class="md:w-1/4">
-            <label for="dateTo" class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
+          <div class="date-container">
+            <label for="dateTo" class="filter-label">To Date</label>
             <input
               id="dateTo"
               v-model="dateTo"
               type="date"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
+              class="filter-input"
             />
           </div>
         </div>
       </div>
       
       <!-- Receipts list -->
-      <div v-if="filteredReceipts.length > 0" class="space-y-4">
+      <div v-if="filteredReceipts.length > 0" class="receipts-list">
         <div
           v-for="receipt in filteredReceipts"
           :key="receipt.id"
-          class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4"
+          class="receipt-card"
         >
           <router-link :to="`/receipt/${receipt.id}`" class="block">
-            <div class="flex justify-between items-start">
-              <div>
-                <h2 class="text-xl font-semibold text-gray-800">{{ receipt.store }}</h2>
-                <p class="text-gray-600">
+            <div class="receipt-card-header">
+              <div class="receipt-info">
+                <h2 class="receipt-store">{{ receipt.store }}</h2>
+                <p class="receipt-meta">
                   {{ formatDate(receipt.date) }} • 
                   {{ receipt.items.length }} items • 
                   ${{ receipt.total.toFixed(2) }}
                 </p>
               </div>
               
-              <div class="flex space-x-2">
+              <div class="receipt-actions">
                 <router-link 
                   :to="`/receipt/${receipt.id}/edit`" 
-                  class="text-primary hover:text-primary-dark"
+                  class="action-button edit-action"
                   @click.stop
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                   </svg>
                 </router-link>
                 
                 <button 
                   @click.stop.prevent="confirmDelete(receipt)" 
-                  class="text-red-500 hover:text-red-700"
+                  class="action-button delete-action"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="action-icon" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                   </svg>
                 </button>
@@ -304,3 +302,286 @@
     }
   });
   </script>
+  
+  <style scoped>
+  /* Container styles */
+  .dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+  }
+  
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .page-title {
+    font-size: 1.875rem;
+    font-weight: bold;
+    color: var(--color-text);
+  }
+  
+  .scan-button {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: background-color var(--transition-fast);
+  }
+  
+  .scan-button:hover {
+    background-color: var(--color-primary-dark);
+  }
+  
+  .button-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+  }
+  
+  .button-text {
+    font-weight: 500;
+  }
+  
+  /* Filter section */
+  .filter-section {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 3px var(--color-shadow);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .filter-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+  }
+  
+  .search-container {
+    width: 100%;
+  }
+  
+  .date-container {
+    width: 100%;
+  }
+  
+  .filter-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.25rem;
+  }
+  
+  .filter-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-size: 1rem;
+  }
+  
+  .filter-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+  }
+  
+  /* Receipts list */
+  .receipts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .receipt-card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 3px var(--color-shadow);
+    padding: 1rem;
+    transition: box-shadow var(--transition-fast);
+    cursor: pointer;
+  }
+  
+  .receipt-card:hover {
+    box-shadow: 0 4px 8px var(--color-shadow);
+  }
+  
+  .receipt-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  
+  .receipt-info {
+    flex: 1;
+  }
+  
+  .receipt-store {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 0.25rem;
+  }
+  
+  .receipt-meta {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+  }
+  
+  .receipt-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .action-button {
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast);
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+  
+  .action-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  
+  .edit-action {
+    color: var(--color-primary);
+  }
+  
+  .edit-action:hover {
+    background-color: var(--color-primary-light);
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+  
+  .delete-action {
+    color: var(--color-error);
+  }
+  
+  .delete-action:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+  }
+  
+  /* Empty state */
+  .empty-state {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 3px var(--color-shadow);
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  /* Delete modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  
+  .modal-content {
+    background-color: var(--color-surface);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 12px var(--color-shadow);
+    max-width: 28rem;
+    width: 90%;
+  }
+  
+  /* Mobile adjustments */
+  @media (max-width: 640px) {
+    .header-section {
+      margin-bottom: 1rem;
+    }
+    
+    .page-title {
+      font-size: 1.5rem;
+    }
+    
+    .scan-button {
+      padding: 0.5rem 0.75rem;
+    }
+    
+    .button-icon {
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.25rem;
+    }
+    
+    .button-text {
+      font-size: 0.875rem;
+    }
+    
+    .filter-section {
+      padding: 0.75rem;
+    }
+    
+    .filter-input {
+      font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    .receipt-card {
+      padding: 0.75rem;
+    }
+    
+    .receipt-store {
+      font-size: 1.1rem;
+    }
+    
+    .receipt-meta {
+      font-size: 0.8rem;
+    }
+    
+    .action-icon {
+      width: 1rem;
+      height: 1rem;
+    }
+    
+    .action-button {
+      padding: 0.375rem;
+    }
+  }
+  
+  /* Tablet adjustments */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .filter-grid {
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .date-container {
+      width: auto;
+    }
+  }
+  
+  /* Desktop adjustments */
+  @media (min-width: 1025px) {
+    .filter-grid {
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 1rem;
+      align-items: end;
+    }
+    
+    .scan-button {
+      padding: 0.5rem 1.5rem;
+    }
+  }
+  </style>

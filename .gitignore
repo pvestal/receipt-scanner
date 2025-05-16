@@ -25,11 +25,13 @@ dist-ssr
 *.local
 
 # Environment variables
-.env
+*.env
+firebase.env
 .env.*
 !.env.example
 
 # Firebase
+src/firebase
 .firebase/
 .firebaserc
 firebase-debug.log

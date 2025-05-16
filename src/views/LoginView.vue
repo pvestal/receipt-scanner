@@ -160,7 +160,7 @@
         const success = await authStore.login(email.value, password.value);
         
         if (success) {
-          router.push('/dashboard');
+          router.push('/');
         }
       };
       

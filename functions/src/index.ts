@@ -81,8 +81,22 @@ export const processReceiptOnUpload = functions.storage
       return null;
     }
     
-    const filePath = object.name;
-    const userId = filePath.split('/')[0]; // Assuming format: userId/receipts/filename
+    const filePath = object.name || '';
+    const pathParts = filePath.split('/');
+    
+    // Validate path format: userId/receipts/filename
+    if (pathParts.length < 3) {
+      console.error(`Invalid file path format: ${filePath}`);
+      return null;
+    }
+    
+    const userId = pathParts[0]; // Assuming format: userId/receipts/filename
+    
+    // Validate userId
+    if (!userId || userId.length < 5) {
+      console.error(`Invalid userId in path: ${filePath}`);
+      return null;
+    }
     
     // Get download URL
     const storage = admin.storage();
@@ -99,13 +113,104 @@ export const processReceiptOnUpload = functions.storage
       const service = new (require('./services/receiptService').ReceiptService)();
       const receipt = await service.processReceipt(signedUrl, userId);
       
-      // Save receipt to database
-      await service.saveReceipt(receipt);
+      // Validate receipt data before saving
+      if (!receipt || 
+          !receipt.store || 
+          !receipt.items || 
+          receipt.items.length === 0 || 
+          !receipt.totals || 
+          receipt.confidence < 0.3) {
+        
+        console.error(`Low quality receipt data, not saving: ${JSON.stringify({
+          fileName: filePath,
+          confidence: receipt?.confidence || 0,
+          itemCount: receipt?.items?.length || 0
+        })}`);
+        
+        // Store this failed processing attempt in a separate collection for review
+        const db = admin.firestore();
+        await db.collection('failedReceipts').add({
+          userId,
+          imageUrl: signedUrl,
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          reason: 'Low quality OCR result',
+          rawData: receipt
+        });
+        
+        return null;
+      }
       
-      console.log(`Successfully processed receipt: ${filePath}`);
+      // Save receipt to database
+      const savedReceipt = await service.saveReceipt(receipt);
+      
+      console.log(`Successfully processed receipt: ${filePath}, id: ${savedReceipt.id}`);
+      
+      // Optionally notify user via FCM that their receipt is ready
+      try {
+        const message = {
+          notification: {
+            title: 'Receipt Processed',
+            body: `Your receipt from ${receipt.store.name} has been processed.`
+          },
+          data: {
+            receiptId: savedReceipt.id || '',
+            store: receipt.store.name,
+            total: receipt.totals.total.toString()
+          },
+          token: await getUserFcmToken(userId)
+        };
+        
+        if (message.token) {
+          await admin.messaging().send(message);
+        }
+      } catch (notificationError) {
+        console.warn('Failed to send notification:', notificationError);
+        // Continue even if notification fails
+      }
+      
       return null;
     } catch (error) {
       console.error(`Error processing uploaded receipt ${filePath}:`, error);
+      
+      // Log the error to Firestore for monitoring
+      try {
+        const db = admin.firestore();
+        await db.collection('errors').add({
+          type: 'receipt_processing',
+          userId,
+          filePath,
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          error: error instanceof Error ? {
+            message: error.message,
+            stack: error.stack
+          } : String(error)
+        });
+      } catch (dbError) {
+        console.error('Failed to log error to database:', dbError);
+      }
+      
       return null;
     }
   });
+
+/**
+ * Helper function to get a user's FCM token for notifications
+ * @param userId User ID
+ * @returns FCM token or null if not found
+ */
+async function getUserFcmToken(userId: string): Promise<string | null> {
+  try {
+    const db = admin.firestore();
+    const userDoc = await db.collection('users').doc(userId).get();
+    
+    if (!userDoc.exists) {
+      return null;
+    }
+    
+    const userData = userDoc.data();
+    return userData?.fcmToken || null;
+  } catch (error) {
+    console.warn('Error getting user FCM token:', error);
+    return null;
+  }
+}

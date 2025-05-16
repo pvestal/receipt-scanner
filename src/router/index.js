@@ -1,21 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/authStore'
+// Import the theme store to handle theme transitions during navigation
+import { nextTick } from 'vue'
 
 const routes = [
   {
     path: '/',
     name: 'Dashboard',
-    component: () => import('../views/Dashboard.vue')
+    component: () => import('../views/DashboardView.vue')
   },
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/Login.vue')
+    component: () => import('../views/LoginView.vue')
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('../views/Register.vue')
+    component: () => import('../views/RegisterView.vue')
   },
   {
     path: '/scan',
@@ -54,6 +56,24 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   const isAuthenticated = authStore.isAuthenticated()
 
+  // Set a custom transition based on navigation direction
+  if (to.meta.transition) {
+    // Use predefined transition if specified in the route
+    to.meta.transitionName = to.meta.transition;
+  } else {
+    // Try to intelligently determine the direction
+    const toDepth = to.path.split('/').length
+    const fromDepth = from.path.split('/').length
+
+    if (toDepth > fromDepth) {
+      to.meta.transitionName = 'slide-left'
+    } else if (fromDepth > toDepth) {
+      to.meta.transitionName = 'slide-right'
+    } else {
+      to.meta.transitionName = 'fade'
+    }
+  }
+
   if (requiresAuth && !isAuthenticated) {
     next('/login')
   } else if ((to.path === '/login' || to.path === '/register') && isAuthenticated) {
@@ -62,6 +82,18 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
+})
+
+// After navigation is complete
+router.afterEach((to) => {
+  // Apply page-specific transitions or animations after navigation completes
+  nextTick(() => {
+    // You could dispatch a custom event or perform additional
+    // transition-related logic here after the route changes
+    document.dispatchEvent(new CustomEvent('route-changed', {
+      detail: { route: to, transitionName: to.meta.transitionName }
+    }));
+  });
 })
 
 export default router

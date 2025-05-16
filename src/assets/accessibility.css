@@ -1,0 +1,188 @@
+/**
+ * Accessibility styles for Receipt Scanner
+ * Provides support for users with various needs including:
+ * - Font size adjustments
+ * - Contrast enhancements
+ * - Reduced motion preferences
+ * - Focus visibility improvements
+ * - Screen reader optimizations
+ */
+
+/* Base accessibility variables */
+:root {
+  /* Font size multiplier (controlled by user preferences) */
+  --a11y-font-size-multiplier: 1;
+  
+  /* Contrast settings */
+  --a11y-contrast-level: 1;
+  --a11y-text-contrast: inherit;
+  --a11y-border-width-multiplier: 1;
+  
+  /* Focus indicators */
+  --a11y-focus-ring-width: 2px;
+  --a11y-focus-ring-color: var(--color-primary);
+  --a11y-focus-ring-offset: 2px;
+  
+  /* Animation durations - will be 0 when reduce-motion is active */
+  --a11y-animation-duration: var(--transition-normal);
+  --a11y-transition-duration: var(--transition-fast);
+}
+
+/* Apply font size adjustments to all text elements */
+html {
+  font-size: calc(16px * var(--a11y-font-size-multiplier));
+}
+
+/* High contrast text */
+.contrast-high,
+.contrast-very-high {
+  --a11y-text-contrast-dark: rgba(255, 255, 255, 0.95);
+  --a11y-text-contrast-light: rgba(0, 0, 0, 0.95);
+}
+
+.contrast-high {
+  --a11y-contrast-level: 1.25;
+}
+
+.contrast-very-high {
+  --a11y-contrast-level: 1.5;
+}
+
+/* Apply contrast settings */
+.contrast-high h1, .contrast-high h2, .contrast-high h3,
+.contrast-high h4, .contrast-high h5, .contrast-high h6,
+.contrast-high p, .contrast-high span, .contrast-high div,
+.contrast-high label, .contrast-high button,
+.contrast-very-high h1, .contrast-very-high h2, .contrast-very-high h3,
+.contrast-very-high h4, .contrast-very-high h5, .contrast-very-high h6,
+.contrast-very-high p, .contrast-very-high span, .contrast-very-high div,
+.contrast-very-high label, .contrast-very-high button {
+  color: var(--a11y-text-contrast);
+}
+
+.contrast-high button,
+.contrast-high input,
+.contrast-high select,
+.contrast-high textarea,
+.contrast-very-high button,
+.contrast-very-high input,
+.contrast-very-high select,
+.contrast-very-high textarea {
+  border-width: calc(1px * var(--a11y-border-width-multiplier)) !important;
+}
+
+/* Reduce motion settings */
+.reduce-motion * {
+  --a11y-animation-duration: 0ms !important;
+  --a11y-transition-duration: 0ms !important;
+  animation-duration: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Focus styles */
+.focus-default :focus {
+  outline: var(--a11y-focus-ring-width) solid var(--a11y-focus-ring-color);
+  outline-offset: var(--a11y-focus-ring-offset);
+}
+
+.focus-enhanced :focus {
+  outline: calc(var(--a11y-focus-ring-width) * 1.5) solid var(--a11y-focus-ring-color);
+  outline-offset: calc(var(--a11y-focus-ring-offset) * 1.5);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5), 0 0 0 4px var(--a11y-focus-ring-color);
+}
+
+.focus-high-visibility :focus {
+  outline: calc(var(--a11y-focus-ring-width) * 2) solid #FF0;
+  outline-offset: calc(var(--a11y-focus-ring-offset) * 2);
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Skip to content link for keyboard users */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.skip-to-content:focus {
+  left: 0;
+  top: 0;
+  width: auto;
+  height: auto;
+  padding: 1rem;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  border: 2px solid var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* For ARIA live regions */
+.sr-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Ensure ARIA live regions are not hidden from screen readers */
+[aria-live="polite"],
+[aria-live="assertive"] {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Enhanced keyboard navigation for interactive elements */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex="0"]:focus-visible {
+  outline: var(--a11y-focus-ring-width) solid var(--a11y-focus-ring-color);
+  outline-offset: var(--a11y-focus-ring-offset);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5), 0 0 0 4px var(--color-primary);
+}
+
+/* Dark mode adjustments for focus */
+.dark-theme a:focus-visible,
+.dark-theme button:focus-visible,
+.dark-theme input:focus-visible,
+.dark-theme select:focus-visible,
+.dark-theme textarea:focus-visible,
+.dark-theme [role="button"]:focus-visible,
+.dark-theme [tabindex="0"]:focus-visible {
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5), 0 0 0 4px var(--color-primary);
+}

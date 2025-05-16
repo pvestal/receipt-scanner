@@ -33,7 +33,7 @@ export class ReceiptParser extends BaseParser<Receipt> {
   /**
    * Parse complete receipt from OCR text
    * @param text Receipt text content
-   * @param context Additional context (userId, imageUrl, etc.)
+   * @param context Additional context (userId, imageUrl, OCR data, etc.)
    */
   async parse(text: string, context?: Record<string, any>): Promise<ParserResult<Receipt>> {
     const errors: string[] = [];
@@ -42,6 +42,8 @@ export class ReceiptParser extends BaseParser<Receipt> {
     // Initialize result with required fields
     const userId = context?.userId || '';
     const imageUrl = context?.imageUrl || '';
+    const ocrConfidence = context?.ocrConfidence || 0;
+    const textBlocks = context?.textBlocks || [];
     
     // Default receipt data
     let receipt: Receipt = {
@@ -58,26 +60,82 @@ export class ReceiptParser extends BaseParser<Receipt> {
     };
     
     try {
+      // Create the enhanced parser context with OCR data
+      const enhancedContext = {
+        ocrConfidence,
+        textBlocks,
+        userId,
+        imageUrl
+      };
+      
+      // Preprocess the OCR result using the advanced OCR preprocessor
+      const preprocessor = await import('../utils/ocrPreprocessor');
+      const preprocessed = preprocessor.preprocessOcrResult(cleanedText, textBlocks);
+      
+      // Use advanced template matching to identify the receipt structure
+      const templateMatcher = await import('../parsers/advancedTemplateMatcher');
+      const advancedMatcher = new templateMatcher.AdvancedTemplateMatcher(this.templates);
+      const templateMatch = advancedMatcher.findBestMatch(cleanedText, textBlocks);
+      
+      // Update the context with preprocessed data
+      const advancedContext = {
+        ...enhancedContext,
+        preprocessed,
+        templateMatch,
+        // Extract detected sections if available
+        sections: preprocessed.sections,
+        lineItems: preprocessed.lineItems
+      };
+      
       // Step 1: Parse store information
-      const storeResult = await this.storeParser.parse(cleanedText);
+      const storeResult = await this.storeParser.parse(cleanedText, advancedContext);
       receipt.store = storeResult.data;
       errors.push(...(storeResult.errors || []));
       
       // Step 2: Parse date
-      const dateResult = await this.dateParser.parse(cleanedText);
+      const dateResult = await this.dateParser.parse(cleanedText, advancedContext);
       receipt.date = dateResult.data;
       errors.push(...(dateResult.errors || []));
       
       // Pass store name to item parser for template matching
-      const itemContext = { storeName: receipt.store.name };
+      const itemContext = { 
+        ...advancedContext,
+        storeName: receipt.store.name 
+      };
       
       // Step 3: Parse items
-      const itemsResult = await this.itemParser.parse(cleanedText, itemContext);
-      receipt.items = itemsResult.data;
-      errors.push(...(itemsResult.errors || []));
+      // If we have preprocessed line items with good confidence, use them
+      if (preprocessed.lineItems.length > 0 && preprocessed.confidence > 0.7) {
+        receipt.items = preprocessed.lineItems.map(item => ({
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity || 1,
+          unitPrice: item.unitPrice,
+          confidence: item.confidence
+        }));
+        
+        // Still run the parser to capture any items that might be missed
+        const itemsResult = await this.itemParser.parse(cleanedText, itemContext);
+        
+        // Compare and merge items if needed
+        if (itemsResult.data.length > receipt.items.length) {
+          console.log(`Merged ${itemsResult.data.length - receipt.items.length} additional items from parser`);
+          receipt.items = this.mergeItems(receipt.items, itemsResult.data);
+        }
+        
+        errors.push(...(itemsResult.errors || []));
+      } else {
+        // Otherwise use the regular item parser
+        const itemsResult = await this.itemParser.parse(cleanedText, itemContext);
+        receipt.items = itemsResult.data;
+        errors.push(...(itemsResult.errors || []));
+      }
       
       // Pass items to totals parser for validation
-      const totalsContext = { items: receipt.items };
+      const totalsContext = { 
+        ...advancedContext,
+        items: receipt.items 
+      };
       
       // Step 4: Parse totals
       const totalsResult = await this.totalsParser.parse(cleanedText, totalsContext);
@@ -94,7 +152,35 @@ export class ReceiptParser extends BaseParser<Receipt> {
       errors.push(`Error in receipt parsing: ${error instanceof Error ? error.message : String(error)}`);
     }
     
-    return this.formatResult(receipt, errors);
+    return this.formatResult(receipt, errors, context);
+  }
+  
+  /**
+   * Merge two sets of items, avoiding duplicates
+   * @param baseItems Base set of items
+   * @param additionalItems Additional items to merge in
+   * @returns Merged items array
+   */
+  private mergeItems(baseItems: ReceiptItem[], additionalItems: ReceiptItem[]): ReceiptItem[] {
+    const result = [...baseItems];
+    const existingItemNames = new Set(baseItems.map(item => item.name.toLowerCase()));
+    
+    // Add items that aren't in the base set
+    for (const item of additionalItems) {
+      const lowercaseName = item.name.toLowerCase();
+      
+      // Check if item has a similar name to an existing item
+      const hasSimilarName = Array.from(existingItemNames).some(name => 
+        name.includes(lowercaseName) || lowercaseName.includes(name)
+      );
+      
+      if (!hasSimilarName) {
+        result.push(item);
+        existingItemNames.add(lowercaseName);
+      }
+    }
+    
+    return result;
   }
   
   /**
@@ -195,12 +281,17 @@ export class ReceiptParser extends BaseParser<Receipt> {
    * Calculate overall confidence score for the entire receipt
    * @param receipt Parsed receipt data
    * @param errors Any errors that occurred during parsing
+   * @param context Additional context (OCR confidence, etc.)
    */
-  protected calculateConfidence(receipt: Receipt, errors: string[] = []): number {
+  protected calculateConfidence(
+    receipt: Receipt, 
+    errors: string[] = [],
+    context?: Record<string, any>
+  ): number {
     // Calculate weighted confidence score based on component confidences
     
-    // Start with base confidence
-    let score = super.calculateConfidence(receipt, errors);
+    // Start with base confidence that includes OCR confidence
+    let score = super.calculateConfidence(receipt, errors, context);
     
     // Get individual component confidence scores
     let storeConfidence = 0;
@@ -251,9 +342,42 @@ export class ReceiptParser extends BaseParser<Receipt> {
       (itemsConfidence * 0.4) +
       (totalsConfidence * 0.3);
     
-    // Final confidence is weighted combination of base and component confidence
-    const finalConfidence = (score * 0.3) + (componentConfidence * 0.7);
+    // OCR confidence is highly important
+    const ocrConfidence = context?.ocrConfidence || 0;
     
-    return Math.max(0, Math.min(1, finalConfidence));
+    // Final confidence is weighted combination of base, component, and OCR confidence
+    // OCR confidence is weighted more heavily as it's fundamental to the process
+    const finalConfidence = 
+      (score * 0.2) + 
+      (componentConfidence * 0.5) + 
+      (ocrConfidence * 0.3);
+    
+    // Additional penalties for severe issues
+    let adjustedConfidence = finalConfidence;
+    
+    // If no items found, severely reduce confidence
+    if (receipt.items.length === 0) {
+      adjustedConfidence *= 0.3;
+    }
+    
+    // If no store name, reduce confidence
+    if (!receipt.store.name) {
+      adjustedConfidence *= 0.7;
+    }
+    
+    // If total amount is zero, reduce confidence
+    if (receipt.totals.total === 0) {
+      adjustedConfidence *= 0.7;
+    }
+    
+    // Adjust based on OCR text length - very short text is likely poor quality
+    const textLength = (receipt.rawText || '').length;
+    if (textLength < 50) {
+      adjustedConfidence *= 0.5;
+    } else if (textLength < 100) {
+      adjustedConfidence *= 0.8;
+    }
+    
+    return Math.max(0, Math.min(1, adjustedConfidence));
   }
 }

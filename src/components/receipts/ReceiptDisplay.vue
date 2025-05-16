@@ -135,69 +135,75 @@
   
   <style scoped>
   .receipt-display {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    max-width: 500px;
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    max-width: 600px;
     margin: 0 auto;
     font-family: 'Courier New', monospace;
-    background-color: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-surface);
+    box-shadow: 0 2px 8px var(--color-shadow);
+    transition: box-shadow var(--transition-normal);
   }
   
   .receipt-header {
     text-align: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed #ccc;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed var(--color-gray-300);
   }
   
   .store-name {
-    margin: 0 0 10px;
+    margin: 0 0 0.75rem;
     font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-text);
   }
   
   .store-address, .store-phone {
-    margin: 4px 0;
+    margin: 0.25rem 0;
     font-size: 0.9rem;
+    color: var(--color-text-secondary);
   }
   
   .receipt-date {
-    margin-top: 10px;
+    margin-top: 0.75rem;
     font-size: 0.9rem;
-    opacity: 0.8;
+    color: var(--color-text-secondary);
   }
   
   .confidence-indicator {
-    margin: 15px 0;
+    margin: 1rem 0;
   }
   
   .confidence-bar {
     height: 8px;
-    background-color: #eee;
-    border-radius: 4px;
+    background-color: var(--color-gray-100);
+    border-radius: var(--radius-sm);
     overflow: hidden;
   }
   
   .confidence-fill {
     height: 100%;
-    background-color: #4caf50;
+    background-color: var(--color-success);
+    transition: width var(--transition-normal);
   }
   
   .confidence-text {
     font-size: 0.8rem;
     text-align: right;
-    margin-top: 4px;
-    opacity: 0.7;
+    margin-top: 0.25rem;
+    color: var(--color-text-secondary);
   }
   
   .receipt-items {
-    margin: 20px 0;
+    margin: 1.5rem 0;
   }
   
   .receipt-items h3 {
-    margin-bottom: 10px;
+    margin-bottom: 0.75rem;
     font-size: 1.1rem;
+    color: var(--color-text);
   }
   
   table {
@@ -206,13 +212,16 @@
   }
   
   th, td {
-    padding: 8px 4px;
+    padding: 0.5rem 0.25rem;
     text-align: left;
+    color: var(--color-text);
   }
   
   th {
-    border-bottom: 1px solid #ddd;
-    font-size: 0.9rem;
+    border-bottom: 1px solid var(--color-gray-200);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
   }
   
   .item-name {
@@ -229,69 +238,164 @@
     text-align: right;
   }
   
-  .low-confidence {
-    background-color: #fff9c4;
+  tr:has(.low-confidence) {
+    background-color: var(--color-warning);
+    opacity: 0.2;
   }
   
   .receipt-totals {
-    margin-top: 20px;
-    border-top: 1px dashed #ccc;
-    padding-top: 10px;
+    margin-top: 1.5rem;
+    border-top: 1px dashed var(--color-gray-300);
+    padding-top: 0.75rem;
   }
   
   .total-row {
     display: flex;
     justify-content: space-between;
-    padding: 4px 0;
+    padding: 0.25rem 0;
+    color: var(--color-text);
   }
   
   .grand-total {
     font-weight: bold;
-    margin-top: 5px;
-    padding-top: 5px;
-    border-top: 1px solid #ddd;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-gray-200);
+    font-size: 1.1rem;
   }
   
   .payment-info {
-    margin-top: 15px;
-    padding-top: 10px;
-    border-top: 1px dashed #ccc;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--color-gray-300);
     font-size: 0.9rem;
+    color: var(--color-text-secondary);
   }
   
   .receipt-actions {
-    margin-top: 20px;
+    margin-top: 1.5rem;
     text-align: center;
   }
   
   .edit-button {
-    background-color: #2196f3;
+    background-color: var(--color-primary);
     color: white;
     border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color var(--transition-fast);
+    width: 100%;
+    max-width: 200px;
   }
   
   .edit-button:hover {
-    background-color: #1976d2;
+    background-color: var(--color-primary-dark);
   }
   
-  @media (max-width: 500px) {
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
     .receipt-display {
-      border-radius: 0;
-      box-shadow: none;
-      padding: 15px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 1px 3px var(--color-shadow);
+      padding: 1rem;
+      margin: 0;
+      max-width: 100%;
     }
     
     .store-name {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
+    }
+    
+    .store-address, .store-phone {
+      font-size: 0.875rem;
+    }
+    
+    .receipt-date {
+      font-size: 0.875rem;
+    }
+    
+    .receipt-items h3 {
+      font-size: 1rem;
+    }
+    
+    table {
+      font-size: 0.875rem;
     }
     
     th, td {
-      padding: 6px 3px;
+      padding: 0.5rem 0.25rem;
+    }
+    
+    th {
+      font-size: 0.8rem;
+    }
+    
+    .item-name {
+      width: 55%;
+      font-size: 0.875rem;
+    }
+    
+    .item-quantity {
+      width: 15%;
+    }
+    
+    .item-price {
+      width: 30%;
+    }
+    
+    .total-row {
       font-size: 0.9rem;
     }
+    
+    .grand-total {
+      font-size: 1rem;
+    }
+    
+    .payment-info {
+      font-size: 0.875rem;
+    }
+    
+    .edit-button {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.9rem;
+      width: 100%;
+      max-width: none;
+    }
+  }
+  
+  /* Small phone adjustments */
+  @media (max-width: 380px) {
+    .receipt-display {
+      padding: 0.75rem;
+    }
+    
+    .store-name {
+      font-size: 1.1rem;
+    }
+    
+    table {
+      font-size: 0.8rem;
+    }
+    
+    th, td {
+      padding: 0.4rem 0.2rem;
+    }
+    
+    .item-name {
+      width: 50%;
+    }
+    
+    .item-price {
+      width: 35%;
+    }
+  }
+  
+  /* Dark theme support */
+  .dark-theme .receipt-display {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
   }
   </style>

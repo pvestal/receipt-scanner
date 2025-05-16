@@ -1,0 +1,226 @@
+/**
+ * Global transition styles for the Receipt Scanner application
+ * Provides smooth, themable transitions between pages and UI states
+ */
+
+/* Main page transitions */
+.page-enter-active,
+.page-leave-active {
+  transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  width: 100%;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+/* Fade transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Slide transitions with direction variants */
+.slide-up-enter-active,
+.slide-up-leave-active,
+.slide-down-enter-active,
+.slide-down-leave-active,
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-up-enter-from,
+.slide-down-leave-to {
+  transform: translateY(30px);
+  opacity: 0;
+}
+
+.slide-up-leave-to,
+.slide-down-enter-from {
+  transform: translateY(-30px);
+  opacity: 0;
+}
+
+.slide-left-enter-from,
+.slide-right-leave-to {
+  transform: translateX(30px);
+  opacity: 0;
+}
+
+.slide-left-leave-to,
+.slide-right-enter-from {
+  transform: translateX(-30px);
+  opacity: 0;
+}
+
+/* Scale transition */
+.scale-enter-active,
+.scale-leave-active {
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scale-enter-from,
+.scale-leave-to {
+  transform: scale(0.95);
+  opacity: 0;
+}
+
+/* Router view transitions for nested routes */
+.nested-router-enter-active,
+.nested-router-leave-active {
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nested-router-enter-from,
+.nested-router-leave-to {
+  opacity: 0;
+}
+
+/* Menu and dropdown transitions */
+.menu-enter-active,
+.menu-leave-active {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top center;
+}
+
+.menu-enter-from,
+.menu-leave-to {
+  opacity: 0;
+  transform: scaleY(0.95) translateY(-10px);
+}
+
+/* Card hover transitions */
+.card-hover-transition {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover-transition:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px var(--color-shadow);
+}
+
+/* Theme-specific transition modifiers */
+.dark-theme .page-enter-from,
+.dark-theme .page-leave-to {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.light-theme .page-enter-from,
+.light-theme .page-leave-to {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Staggered list item animations */
+.list-item {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* Staggered list with delay based on index */
+.list-staggered-move {
+  transition: transform 0.5s;
+}
+
+.list-staggered-enter-active {
+  transition: all 0.5s ease;
+  transition-delay: calc(0.05s * var(--i));
+}
+
+.list-staggered-leave-active {
+  transition: all 0.5s ease;
+  transition-delay: calc(0.05s * var(--i));
+}
+
+.list-staggered-enter-from,
+.list-staggered-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+/* Wave effect transitions for lists or grids */
+.wave-enter-active {
+  transition: all 0.3s ease;
+  transition-delay: calc(0.05s * var(--i));
+}
+
+.wave-leave-active {
+  transition: all 0.3s ease;
+  transition-delay: calc(0.05s * var(--i-reverse));
+}
+
+.wave-enter-from,
+.wave-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* Button animations */
+.button-press {
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.button-press:active {
+  transform: scale(0.96);
+}
+
+/* Animated route change loader */
+.route-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  z-index: 9999;
+  background: linear-gradient(
+    to right,
+    var(--color-primary) 0%,
+    var(--color-secondary) 50%,
+    var(--color-accent) 100%
+  );
+  transform-origin: left;
+  animation: route-loader-animation 2s ease-in-out infinite;
+}
+
+@keyframes route-loader-animation {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  50.1% {
+    transform-origin: right;
+  }
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}

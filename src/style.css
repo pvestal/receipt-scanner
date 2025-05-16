@@ -2,6 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global mobile optimizations */
+@layer base {
+  /* Prevent iOS zoom on input focus */
+  @media (max-width: 768px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
+  
+  /* Ensure touch targets are at least 44x44px as per Apple guidelines */
+  button, 
+  a, 
+  .clickable,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent text selection on buttons */
+  button {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Prevent double-tap zoom on buttons and links */
+  button, a {
+    touch-action: manipulation;
+  }
+}
+
 @layer components {
   .btn {
     @apply px-4 py-2 rounded-lg font-medium transition-colors;

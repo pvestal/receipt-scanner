@@ -1,0 +1,155 @@
+/**
+ * Custom styles for icons to ensure proper sizing and smooth transitions
+ * Enhanced with improved contrast and animations
+ */
+
+/* Base icon styling */
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1.5rem;  /* 24px */
+  height: 1.5rem; /* 24px */
+  transition: all var(--transition-fast);
+  transform-origin: center;
+}
+
+/* Small variant */
+.icon-sm {
+  width: 1rem;   /* 16px */
+  height: 1rem;  /* 16px */
+}
+
+/* Medium variant (default) */
+.icon-md {
+  width: 1.5rem;  /* 24px */
+  height: 1.5rem; /* 24px */
+}
+
+/* Large variant */
+.icon-lg {
+  width: 2rem;   /* 32px */
+  height: 2rem;  /* 32px */
+}
+
+/* Extra large variant */
+.icon-xl {
+  width: 2.5rem;  /* 40px */
+  height: 2.5rem; /* 40px */
+}
+
+/* Icon colors with improved contrast and using CSS variables */
+.icon-primary {
+  color: var(--color-primary);
+  transition: all var(--transition-fast);
+}
+
+.icon-primary:hover {
+  color: var(--color-primary-dark);
+  transform: scale(1.05);
+}
+
+.icon-secondary {
+  color: var(--color-secondary);
+  transition: all var(--transition-fast);
+}
+
+.icon-secondary:hover {
+  color: var(--color-secondary-dark);
+  transform: scale(1.05);
+}
+
+.icon-accent {
+  color: var(--color-accent);
+  transition: all var(--transition-fast);
+}
+
+.icon-accent:hover {
+  color: var(--color-accent-dark);
+  transform: scale(1.05);
+}
+
+.icon-gray {
+  color: var(--color-gray-500);
+  transition: all var(--transition-fast);
+}
+
+.icon-gray:hover {
+  color: var(--color-gray-700);
+  transform: scale(1.05);
+}
+
+/* High-contrast versions for accessibility */
+.icon-high-contrast {
+  color: var(--color-high-contrast-text);
+  transition: all var(--transition-fast);
+}
+
+.dark-theme .icon-high-contrast {
+  color: var(--color-high-contrast-text);
+}
+
+/* Icon animations */
+.icon-spin {
+  animation: icon-spin 2s linear infinite;
+}
+
+.icon-pulse {
+  animation: icon-pulse 1.5s ease-in-out infinite;
+}
+
+.icon-bounce {
+  animation: icon-bounce 1s var(--animation-bounce) infinite;
+}
+
+@keyframes icon-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes icon-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes icon-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* For SVG icons */
+svg.icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Fixed size overrides for specific use cases */
+.upload-icon,
+.camera-icon {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+}
+
+@media (min-width: 640px) {
+  .upload-icon,
+  .camera-icon {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+}
